@@ -1,6 +1,7 @@
 import java.io.*;
+import java.util.Arrays;
 
-public class Basket {
+public class Basket implements Serializable{
     protected static int[] prices;
     protected static String[] products;
     protected static int[] totalSum;
@@ -14,6 +15,11 @@ public class Basket {
     public Basket(String[] products, int[] prices, int[] totalSum) {
         this.products = products;
         this.prices = prices;
+        this.totalSum = totalSum;
+    }
+
+    public Basket(int[] totalSum, String[] products) {
+        this.products = products;
         this.totalSum = totalSum;
     }
 
@@ -40,7 +46,7 @@ public class Basket {
         }
     }
 
-    public Basket loadFromTxtFile(File textFile) throws IOException {
+    public static Basket loadFromTxtFile(File textFile) throws IOException {
         try {
 
             BufferedReader reader = new BufferedReader(new FileReader(textFile));
@@ -87,7 +93,46 @@ public class Basket {
         return null;
     }
 
+    public void saveBin (File file){
+        try {
+            FileOutputStream outputStream = new FileOutputStream(file);
+            ObjectOutputStream objectOutputStream = new ObjectOutputStream(outputStream);
+            int [] saveSum = this.totalSum;
+            Basket basketo = new Basket(saveSum, products);
+            objectOutputStream.writeObject(basketo);
+            objectOutputStream.close();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
 
+    public static Basket loadFromBinFile(File file){
+        try {
+            FileInputStream fileInputStream = new FileInputStream("basket.bin");
+            ObjectInputStream objectInputStream = new ObjectInputStream(fileInputStream);
+            Basket basketo = (Basket) objectInputStream.readObject();
+
+            String[] loadProducts = new String[products.length];
+            int[] loadPrices = new int[products.length];
+            int[] loadSum = new int[products.length];
+            int i = 0;
+
+            while (i < products.length) {
+                loadProducts[i] = basketo.products[i];
+                loadSum[i] = basketo.totalSum[i];
+                loadPrices[i] = basketo.prices[i];
+                i++;
+            }
+            objectInputStream.close();
+
+            return basketo;
+
+        }  catch (IOException i) {
+        } catch (ClassNotFoundException e) {
+            throw new RuntimeException(e);
+        }
+        return null;
+    }
 }
 
 

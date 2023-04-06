@@ -1,12 +1,11 @@
-import org.w3c.dom.ls.LSOutput;
-
-import java.io.File;
+import java.io.*;
+import java.util.Arrays;
 import java.util.Scanner;
 
 public class Main {
     public static void main(String[] args) throws Exception{
 
-        File textFile = new File("File.txt");
+        File textFile = new File("basket.bin");
         Scanner scanner = new Scanner(System.in);
 
         String[] products = {"Молоко", "Хлеб", "Гречка", "Яблоко", "Баранина"};
@@ -18,16 +17,16 @@ public class Main {
 
         Basket basket = new Basket(products, prices);
         if (!textFile.exists()){
-            System.out.println("Корзина не найдены, будет составлена заново");
+            System.out.println("Корзина не найдена, будет составлена заново");
         }
-        basket.loadFromTxtFile(textFile);
+        basket.loadFromBinFile(textFile);
 
         while (true) {
             System.out.println("Введите номер товара и его количество, 'basket' для вывода вашей корзины, 'end' для завершения программы");
             String input = scanner.nextLine();
             if (input.equals("end")) {
                 basket.printCart();
-                basket.saveTxt(textFile);
+                basket.saveBin(textFile);
                 break;
             }
             if (input.equals("basket")){
@@ -39,7 +38,6 @@ public class Main {
             int productNumber = Integer.parseInt(parts[0]);
             int productCount = Integer.parseInt(parts[1]);
             basket.addToCart(productNumber, productCount);
-
         }
-    }
+  }
 }
