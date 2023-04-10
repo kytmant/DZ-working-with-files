@@ -1,10 +1,9 @@
 import java.io.*;
-import java.util.Arrays;
 
-public class Basket implements Serializable{
-    protected static int[] prices;
-    protected static String[] products;
-    protected static int[] totalSum;
+public class Basket implements Serializable {
+    protected int[] prices;
+    protected String[] products;
+    protected int[] totalSum;
 
     public Basket(String[] products, int[] prices) {
         this.products = products;
@@ -60,6 +59,7 @@ public class Basket implements Serializable{
             howLines.close();
             String[] loadProducts = new String[lines];
             int[] loadPrices = new int[lines];
+            int[] loadTotalSum = new int[lines];
             int i = 0;
 
             String line = reader.readLine();
@@ -70,20 +70,14 @@ public class Basket implements Serializable{
                 int productCount = Integer.parseInt(parts[1]);
 
                 loadProducts[i] = nameProducts;
-                totalSum[i] = productCount;
-
-                if (productCount != 0) {
-                    loadPrices[i] = productCount / (productCount / prices[i]);
-                } else {
-                    loadPrices[i] = prices[i];
-                }
+                loadTotalSum[i] = productCount;
 
                 line = reader.readLine();
                 i++;
             }
 
             reader.close();
-            Basket loadBasket = new Basket(loadProducts, loadPrices, totalSum);
+            Basket loadBasket = new Basket(loadProducts, loadPrices, loadTotalSum);
             System.out.println("Ваша корзина найдена, данные восстановлены.");
             loadBasket.printCart();
             return loadBasket;
@@ -93,11 +87,11 @@ public class Basket implements Serializable{
         return null;
     }
 
-    public void saveBin (File file){
+    public void saveBin(File file) {
         try {
             FileOutputStream outputStream = new FileOutputStream(file);
             ObjectOutputStream objectOutputStream = new ObjectOutputStream(outputStream);
-            int [] saveSum = this.totalSum;
+            int[] saveSum = this.totalSum;
             Basket basketo = new Basket(saveSum, products);
             objectOutputStream.writeObject(basketo);
             objectOutputStream.close();
@@ -106,34 +100,24 @@ public class Basket implements Serializable{
         }
     }
 
-    public static Basket loadFromBinFile(File file){
+    public static Basket loadFromBinFile(File file) throws IOException {
         try {
             FileInputStream fileInputStream = new FileInputStream("basket.bin");
             ObjectInputStream objectInputStream = new ObjectInputStream(fileInputStream);
             Basket basketo = (Basket) objectInputStream.readObject();
-
-            String[] loadProducts = new String[products.length];
-            int[] loadPrices = new int[products.length];
-            int[] loadSum = new int[products.length];
-            int i = 0;
-
-            while (i < products.length) {
-                loadProducts[i] = basketo.products[i];
-                loadSum[i] = basketo.totalSum[i];
-                loadPrices[i] = basketo.prices[i];
-                i++;
-            }
             objectInputStream.close();
 
+            System.out.println("Ваша корзина найдена, данные восстановлены.");
+            basketo.printCart();
             return basketo;
 
-        }  catch (IOException i) {
+        } catch (FileNotFoundException ignored) {
         } catch (ClassNotFoundException e) {
             throw new RuntimeException(e);
-        }
-        return null;
+        }return null;
     }
 }
+
 
 
 
