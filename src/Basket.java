@@ -1,7 +1,7 @@
 import java.io.*;
 
 public class Basket implements Serializable {
-    protected int[] prices;
+    protected static int[] prices;
     protected String[] products;
     protected int[] totalSum;
 
@@ -47,7 +47,7 @@ public class Basket implements Serializable {
 
     public static Basket loadFromTxtFile(File textFile) throws IOException {
         try (BufferedReader reader = new BufferedReader(new FileReader(textFile));
-        LineNumberReader howLines = new LineNumberReader(new FileReader(textFile))){
+             LineNumberReader howLines = new LineNumberReader(new FileReader(textFile))) {
             int lines = 0;
             while (howLines.readLine() != null) {
                 lines++;
@@ -77,23 +77,22 @@ public class Basket implements Serializable {
         }
     }
 
-    public void saveBin(File file) {
-        try (ObjectOutputStream objectOutputStream = new ObjectOutputStream(new FileOutputStream(file))){
+    public void saveBin(File file) throws IOException {
+        try (ObjectOutputStream objectOutputStream = new ObjectOutputStream(new FileOutputStream(file))) {
             int[] saveSum = this.totalSum;
             Basket basketo = new Basket(saveSum, products);
             objectOutputStream.writeObject(basketo);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
         }
     }
 
-    public static Basket loadFromBinFile(File file) throws IOException {
-        try (ObjectInputStream objectInputStream = new ObjectInputStream(new FileInputStream("basket.bin"))){
+    public static Basket loadFromBinFile(File file) throws IOException, ClassNotFoundException {
+        try (ObjectInputStream objectInputStream = new ObjectInputStream(new FileInputStream("basket.bin"))) {
             Basket basketo = (Basket) objectInputStream.readObject();
             System.out.println("Ваша корзина найдена, данные восстановлены.");
             basketo.printCart();
             return basketo;
-        } catch (FileNotFoundException | ClassNotFoundException e) {
+        }catch (FileNotFoundException e) {
+            System.out.println("Файл корзины не найден. Корзина будет составлена заново");
         }
         return null;
     }
