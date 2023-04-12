@@ -46,17 +46,12 @@ public class Basket implements Serializable {
     }
 
     public static Basket loadFromTxtFile(File textFile) throws IOException {
-        try {
-
-            BufferedReader reader = new BufferedReader(new FileReader(textFile));
-            LineNumberReader howLines = new LineNumberReader(new FileReader(textFile));
-
+        try (BufferedReader reader = new BufferedReader(new FileReader(textFile));
+        LineNumberReader howLines = new LineNumberReader(new FileReader(textFile))){
             int lines = 0;
             while (howLines.readLine() != null) {
                 lines++;
             }
-
-            howLines.close();
             String[] loadProducts = new String[lines];
             int[] loadPrices = new int[lines];
             int[] loadTotalSum = new int[lines];
@@ -75,46 +70,32 @@ public class Basket implements Serializable {
                 line = reader.readLine();
                 i++;
             }
-
-            reader.close();
             Basket loadBasket = new Basket(loadProducts, loadPrices, loadTotalSum);
             System.out.println("Ваша корзина найдена, данные восстановлены.");
             loadBasket.printCart();
             return loadBasket;
-
-        } catch (FileNotFoundException e) {
         }
-        return null;
     }
 
     public void saveBin(File file) {
-        try {
-            FileOutputStream outputStream = new FileOutputStream(file);
-            ObjectOutputStream objectOutputStream = new ObjectOutputStream(outputStream);
+        try (ObjectOutputStream objectOutputStream = new ObjectOutputStream(new FileOutputStream(file))){
             int[] saveSum = this.totalSum;
             Basket basketo = new Basket(saveSum, products);
             objectOutputStream.writeObject(basketo);
-            objectOutputStream.close();
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
     }
 
     public static Basket loadFromBinFile(File file) throws IOException {
-        try {
-            FileInputStream fileInputStream = new FileInputStream("basket.bin");
-            ObjectInputStream objectInputStream = new ObjectInputStream(fileInputStream);
+        try (ObjectInputStream objectInputStream = new ObjectInputStream(new FileInputStream("basket.bin"))){
             Basket basketo = (Basket) objectInputStream.readObject();
-            objectInputStream.close();
-
             System.out.println("Ваша корзина найдена, данные восстановлены.");
             basketo.printCart();
             return basketo;
-
-        } catch (FileNotFoundException ignored) {
-        } catch (ClassNotFoundException e) {
-            throw new RuntimeException(e);
-        }return null;
+        } catch (FileNotFoundException | ClassNotFoundException e) {
+        }
+        return null;
     }
 }
 
