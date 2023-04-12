@@ -1,9 +1,9 @@
 import java.io.*;
 
 public class Basket {
-    protected static int[] prices;
-    protected static String[] products;
-    protected static int[] totalSum;
+    protected int[] prices;
+    protected String[] products;
+    protected int[] totalSum;
 
     public Basket(String[] products, int[] prices) {
         this.products = products;
@@ -41,11 +41,8 @@ public class Basket {
     }
 
     public Basket loadFromTxtFile(File textFile) throws IOException {
-        try {
-
-            BufferedReader reader = new BufferedReader(new FileReader(textFile));
-            LineNumberReader howLines = new LineNumberReader(new FileReader(textFile));
-
+        try (BufferedReader reader = new BufferedReader(new FileReader(textFile));
+             LineNumberReader howLines = new LineNumberReader(new FileReader(textFile))) {
             int lines = 0;
             while (howLines.readLine() != null) {
                 lines++;
@@ -82,12 +79,10 @@ public class Basket {
             loadBasket.printCart();
             return loadBasket;
 
-        } catch (FileNotFoundException e) {
+        } catch (FileNotFoundException ignored) {
         }
         return null;
     }
-
-
 }
 
 
