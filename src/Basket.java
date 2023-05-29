@@ -1,3 +1,6 @@
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+
 import java.io.*;
 
 public class Basket {
@@ -40,7 +43,7 @@ public class Basket {
         }
     }
 
-    public Basket loadFromTxtFile(File textFile) throws IOException {
+    public static Basket loadFromTxtFile(File textFile) throws IOException {
         try (BufferedReader reader = new BufferedReader(new FileReader(textFile));
              LineNumberReader howLines = new LineNumberReader(new FileReader(textFile))) {
             int lines = 0;
@@ -51,6 +54,7 @@ public class Basket {
             howLines.close();
             String[] loadProducts = new String[lines];
             int[] loadPrices = new int[lines];
+            int[] totalSum = new int[lines];
             int i = 0;
 
             String line = reader.readLine();
@@ -61,12 +65,12 @@ public class Basket {
                 int productCount = Integer.parseInt(parts[1]);
 
                 loadProducts[i] = nameProducts;
-                totalSum[i] = productCount;
+                totalSum [i] = productCount;
 
                 if (productCount != 0) {
-                    loadPrices[i] = productCount / (productCount / prices[i]);
+                    loadPrices[i] = productCount / (productCount / Main.prices[i]);
                 } else {
-                    loadPrices[i] = prices[i];
+                    loadPrices[i] = Main.prices[i];
                 }
 
                 line = reader.readLine();
@@ -82,8 +86,35 @@ public class Basket {
         } catch (FileNotFoundException ignored) {
         }
         return null;
+        }
+
+    public void saveJson (File textFile){
+        try (PrintWriter writer = new PrintWriter(textFile)) {
+            Gson gson = new GsonBuilder().setPrettyPrinting().create();
+            String json = gson.toJson(this);
+            writer.print(json);
+        } catch (FileNotFoundException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public static Basket loadFromJsonFile(File file) {
+        Basket basket = null;
+        try (BufferedReader reader = new BufferedReader(new FileReader(file))){
+            StringBuilder builder = new StringBuilder();
+            String line ;
+            while ((line = reader.readLine()) !=null){
+                builder.append(line);
+            }
+            Gson gson = new Gson();
+            basket = gson.fromJson(builder.toString(), Basket.class);
+        } catch (IOException e) {
+        }
+        System.out.println("Ваша корзина найдена, данные восстановлены.");
+        return basket;
     }
 }
+
 
 
 
